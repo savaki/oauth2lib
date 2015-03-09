@@ -24,8 +24,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// no code?  user must not have authorized the request
 	if code == "" {
 		ctx := &Context{
-			Error: ErrNotAuthorized,
-			w:     w,
+			Error:    ErrNotAuthorized,
+			Response: w,
 		}
 		h.callback(ctx)
 		return
@@ -34,31 +34,32 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// otherwise, let's see what goodies we received
 	t, err := h.exchange(oauth2.NoContext, code)
 	ctx := &Context{
-		Token:   t,
-		Error:   err,
-		Request: req,
-		w:       w,
+		Token:    t,
+		Error:    err,
+		Request:  req,
+		Response: w,
 	}
 	h.callback(ctx)
 }
 
+// CallbackFunc defines the user callback that gets invoked once the user
+// authorizes (or doesn't) the application
 type CallbackFunc func(*Context)
 
+// Context holds the relevant values for the CallbackFunc
 type Context struct {
-	Token   *oauth2.Token
-	Error   error
+	// the oauth2 authorization token
+	Token *oauth2.Token
+
+	// holds any error that occurrs while attempting to retrieve the oauth token
+	// if the user does not authorize the request, that too is considered an
+	// err and returns oauth2lib.ErrNotAuthorized
+	Error error
+
+	// the original request received by the user.  only provided to support methods
+	// like http.Redirect which require the original request
 	Request *http.Request
-	w       http.ResponseWriter
-}
 
-func (c *Context) Header() http.Header {
-	return c.w.Header()
-}
-
-func (c *Context) Write(b []byte) (int, error) {
-	return c.w.Write(b)
-}
-
-func (c *Context) WriteHeader(code int) {
-	c.w.WriteHeader(code)
+	// the original response the user may use for redirects and the like
+	Response http.ResponseWriter
 }

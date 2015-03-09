@@ -44,7 +44,7 @@ func TestConnectors(t *testing.T) {
 			})
 
 			Convey("And I expect the response write to be set", func() {
-				So(ctx.w, ShouldEqual, w)
+				So(ctx.Response, ShouldEqual, w)
 			})
 		})
 
@@ -63,7 +63,7 @@ func TestConnectors(t *testing.T) {
 			})
 
 			Convey("And I expect the response write to be set", func() {
-				So(ctx.w, ShouldEqual, w)
+				So(ctx.Response, ShouldEqual, w)
 			})
 		})
 	})
