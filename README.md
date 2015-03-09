@@ -29,6 +29,6 @@ func main() {
 
 func authorize(c *oauth2lib.Context) {
 	fmt.Println("access token is", c.Token.AccessToken)
-	http.Redirect(c, c.Request, "/blah", http.StatusTemporaryRedirect)
+	http.Redirect(c.Response, c.Request, "/blah", http.StatusTemporaryRedirect)
 }
 ```
